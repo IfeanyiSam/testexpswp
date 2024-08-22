@@ -13,25 +13,12 @@ This project demonstrates deploying a Node.js application on AWS using Terraform
 - An AWS account configured with access keys.
 - Basic knowledge of Terraform and Docker.
 
-## Infrastructure Components
-
-1. **VPC**: Creates a Virtual Private Cloud to isolate the infrastructure within its own network.
-2. **Public Subnets**: Two public subnets are created in different Availability Zones (`us-east-1a` and `us-east-1b`).
-3. **Internet Gateway**: Allows the VPC to communicate with the internet.
-4. **Route Table**: Configures the routing of traffic between the VPC and the internet via the Internet Gateway.
-5. **Security Group**: Configures firewall rules to allow traffic on ports 80 (HTTP) and 3000 (application port).
-6. **Key Pair**: Automatically generates an SSH key pair for secure access to EC2 instances.
-7. **EC2 Instances**: Launches two EC2 instances in the public subnets with a user data script for initialization.
-8. **Application Load Balancer (ALB)**: Distributes incoming traffic across the EC2 instances.
-9. **Target Group**: Manages the instances registered with the ALB.
-10. **Health Check**: Ensures that the ALB routes traffic only to healthy instances by checking the `/api/greeting` endpoint.
-
 ## Important Files
 
 - **Dockerfile**: Defines the environment and dependencies for the Node.js application.
 - **docker-compose.yml**: Manages the container lifecycle.
 - **main.tf**: Terraform configuration file defining the AWS resources.
-- **userdata.sh**: Script to install Docker and Docker Compose on the EC2 instances, clones the repository, builds the app image and starts the container
+- **userdata.sh**: Script to install Docker and Docker Compose on the EC2 instances, clones the repository, builds the app image and starts the app container
 
 ## Usage
 
@@ -78,49 +65,49 @@ If you want to tear down the infrastructure, run `terraform destroy`. Confirm th
 terraform destroy
 ```
 
-## Configuration
+### Setup Details
 
-### VPC Configuration
+#### 1. VPC and Subnet Configuration
+- A VPC was created with a CIDR block of `10.0.0.0/16`.
+- Two public subnets were created in different Availability Zones:
+  - **Subnet 1 (AZ: us-east-1a):** CIDR block `10.0.1.0/24`.
+  - **Subnet 2 (AZ: us-east-1b):** CIDR block `10.0.2.0/24`.
+- An Internet Gateway (IGW) was attached to allow communication from the internet to the instances.
+- A route table was set up with a route to forward all traffic (`0.0.0.0/0`) to the IGW.
+- The subnets were associated with the route table to ensure they had internet access.
 
-- **CIDR Block**: `10.0.0.0/16`
+#### 2. Security Group Configuration
+- A security group was created to:
+  - Allow inbound HTTP traffic on port `80` (for the ALB).
+  - Allow inbound traffic on port `3000` (for the application running on EC2).
+  - Allow all outbound traffic.
 
-### Subnets
+#### 3. EC2 Instance Configuration
+- Two EC2 instances were launched with the following configurations:
+  - **AMI:** `ami-0e86e20dae9224db8` (Ubuntu-based).
+  - **Instance Type:** `t2.micro`.
+  - **Key Pair:** Auto-generated using Terraform.
+- Both instances were placed in separate subnets for redundancy:
+  - **Instance 1:** Subnet 1 (us-east-1a).
+  - **Instance 2:** Subnet 2 (us-east-1b).
+- A user data script (`userdata.sh`) was used to install Docker and Docker Compose on both instances.
 
-- **Public Subnet 1 (us-east-1a)**: `10.0.1.0/24`
-- **Public Subnet 2 (us-east-1b)**: `10.0.2.0/24`
+#### 4. Application Load Balancer (ALB) Setup
+- An ALB was configured to:
+  - Listen on port `80` and forward traffic to a target group listening on port `3000`.
+  - The target group was associated with both EC2 instances.
+  - Health checks were set up using the path `/api/greeting`, with HTTP as the protocol.
 
-### Security Group
+### Automation Explanation (Terraform)
 
-- Allows inbound traffic on ports 80 and 3000.
-- Allows all outbound traffic.
+#### Overview
+Terraform was used to define and automate the following infrastructure components:
 
-### EC2 Instances
+- **VPC and Networking:** The VPC, subnets, Internet Gateway, and route tables were defined to create a custom network.
+- **EC2 Instances:** Instances were launched using an Ubuntu AMI, with a user data script for Docker installation.
+- **Security Groups:** Configured to control traffic flow to the instances and ALB.
+- **ALB and Target Groups:** Set up to distribute traffic across the EC2 instances.
 
-- **AMI**: `ami-0e86e20dae9224db8`
-- **Instance Type**: `t2.micro`
-- **Tags**:
-  - `app_server1`
-  - `app_server2`
-
-### Load Balancer
-
-- **Name**: `app_lb`
-- Listens on port 80 and forwards traffic to the target group on port 3000.
-
-### Health Check
-
-- **Path**: `/api/greeting`
-- **Protocol**: `HTTP`
-- **Port**: `traffic-port`
-- **Interval**: 30 seconds
-- **Timeout**: 5 seconds
-- **Healthy Threshold**: 3
-- **Unhealthy Threshold**: 2
-
-## Files
-
-- **`main.tf`**: The main Terraform configuration file defining the AWS resources.
-- **`userdata.sh`**: User data script executed on instance startup. (Ensure this file is present in the same directory as `main.tf`)
 
 ## Notes
 

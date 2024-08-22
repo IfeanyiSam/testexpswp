@@ -1,10 +1,19 @@
-# Terraform Infrastructure Setup
+# Terraform Project: Deploying a Dockerized Node.js Application on AWS
 
 ## Overview
+This project demonstrates deploying a Node.js application on AWS using Terraform. The infrastructure includes a VPC with public subnets, EC2 instances running Dockerized containers, and an Application Load Balancer (ALB) to route traffic. The Node.js application is containerized with Docker, and Docker Compose is used to manage the container lifecycle.
 
-This project sets up an AWS infrastructure using Terraform, including a Virtual Private Cloud (VPC), public subnets, EC2 instances, a security group, an application load balancer (ALB), and a target group. The setup ensures that two EC2 instances are launched in different Availability Zones and are automatically registered with an ALB for load balancing.
+## Architecture
+- **VPC** with two public subnets.
+- **EC2 Instances** running Ubuntu, provisioned with Docker and Docker Compose.
+- **Application Load Balancer** (ALB) distributing traffic to the EC2 instances.
 
-## Components
+## Prerequisites
+- [Terraform](https://www.terraform.io/downloads.html) installed.
+- An AWS account configured with access keys.
+- Basic knowledge of Terraform and Docker.
+
+## Infrastructure Components
 
 1. **VPC**: Creates a Virtual Private Cloud to isolate the infrastructure within its own network.
 2. **Public Subnets**: Two public subnets are created in different Availability Zones (`us-east-1a` and `us-east-1b`).
@@ -17,19 +26,21 @@ This project sets up an AWS infrastructure using Terraform, including a Virtual 
 9. **Target Group**: Manages the instances registered with the ALB.
 10. **Health Check**: Ensures that the ALB routes traffic only to healthy instances by checking the `/api/greeting` endpoint.
 
-## Requirements
+## Important Files
 
-- **Terraform**: Ensure you have Terraform installed on your machine. You can download it from [Terraform's official site](https://www.terraform.io/downloads.html).
-- **AWS CLI**: Install and configure the AWS CLI with appropriate credentials.
+- **Dockerfile**: Defines the environment and dependencies for the Node.js application.
+- **docker-compose.yml**: Manages the container lifecycle.
+- **main.tf**: Terraform configuration file defining the AWS resources.
+- **userdata.sh**: Script to install Docker and Docker Compose on the EC2 instances, clones the repository, builds the app image and starts the container
 
 ## Usage
 
 1. ## Clone the Repository:
 
    ```bash
-   git clone https://github.com/IfeanyiSam/devops-task2.git 
+   git clone https://github.com/IfeanyiSam/testexpswp.git 
 
-   cd devops-task/components/node-app 
+   cd testexpswp/node-app 
 
 2. ## Initialization and Management
 

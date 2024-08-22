@@ -65,7 +65,7 @@ If you want to tear down the infrastructure, run `terraform destroy`. Confirm th
 terraform destroy
 ```
 
-### Setup Details
+# Setup Details
 
 #### 1. VPC and Subnet Configuration
 - A VPC was created with a CIDR block of `10.0.0.0/16`.

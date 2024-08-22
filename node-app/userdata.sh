@@ -17,7 +17,7 @@ sudo apt-get update -y
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 # Clone the repository
-git clone https://github.com/IfeanyiSam/devops-task2.git /home/ubuntu/devops-task
+git clone https://github.com/IfeanyiSam/testexpswp.git /home/ubuntu/devops-task
 
 # Navigate to the Node.js app directory
 cd /home/ubuntu/devops-task/components/node-app || exit
